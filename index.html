@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>株式会社Re-Light</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    /* ☰とMENU */
+    .top-bar {
+      background-color: #000;
+      color: white;
+      text-align: right;
+      padding: 10px 20px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .top-bar .menu-toggle {
+      font-size: 26px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .top-bar.hidden {
+      display: none;
+    }
+
+    .menu-label {
+      text-align: right;
+      padding: 0 20px 10px;
+      color: white;
+      background-color: #000;
+      font-size: 12px;
+      position: fixed;
+      top: 50px;
+      width: 100%;
+      z-index: 999;
+    }
+
+    header {
+      background-color: #000;
+      text-align: center;
+      padding: 80px 0 20px;
+    }
+
+    header img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* フルスクリーンメニュー */
+    .full-menu {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      color: white;
+      overflow-y: auto;
+      z-index: 2000;
+      padding-top: 80px;
+      text-align: center;
+    }
+
+    .full-menu.active {
+      display: block;
+    }
+
+    .full-menu a {
+      display: block;
+      color: white;
+      font-size: 24px;
+      text-decoration: none;
+      margin: 20px 0;
+    }
+
+    .full-menu a:hover {
+      text-decoration: underline;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 28px;
+      color: white;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .close-label {
+      position: absolute;
+      top: 50px;
+      right: 20px;
+      color: white;
+      font-size: 12px;
+    }
+
+    section {
+      padding: 80px 20px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .form-wrapper {
+      position: relative;
+      padding-bottom: 150%;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .form-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    footer {
+      background-color: #f1f1f1;
+      text-align: center;
+      padding: 15px 10px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ☰とMENU -->
+  <div class="top-bar" id="topBar">
+    <button class="menu-toggle" id="menuToggle">☰</button>
+  </div>
+  <div class="menu-label" id="menuLabel">MENU</div>
+
+  <!-- フルスクリーンメニュー -->
+  <div class="full-menu" id="fullMenu">
+    <button class="close-btn" id="closeBtn">✕</button>
+    <div class="close-label">閉じる</div>
+    <a href="#home">ホーム</a>
+    <a href="#about">会社概要</a>
+    <a href="#services">サービス</a>
+    <a href="#recruit">採用情報</a>
+    <a href="#contact">お問い合わせ</a>
+  </div>
+
+  <!-- ヘッダー -->
+  <header>
+    <img src="logo.jpg" alt="株式会社Re-Light ロゴ">
+  </header>
+  
+  <!-- コンテンツ -->
+  <section id="home">
+    <h2>ホーム</h2>
+    <p>株式会社Re-Lightのホームページへようこそ。</p>
+    <p>実はこのホームページ、自分たちで作りました！</p>
+  </section>
+
+  <section id="about">
+    <h2>⬛︎会社概要</h2>
+    <p>会社名:株式会社Re-Light</p>
+    <p>所在地:</p>
+    <p>連絡先:</p>
+    <p>代表者名:</p>
+    <p>事業内容:
+    <p>資本金:</p>
+    <p>従業員数:</p>
+    <p>設立年月日:</p>
+    <p>沿革:</p>
+    <p>企業理念:</p>
+    <p>ミッション:</p>
+    <p>主要取引先:</p>
+    <p>主要取引銀行:</p>
+    <p>URL:会社のホームページアドレス</p>
+    <p>代表挨拶:</p>
+  </section>
+
+  <section id="services">
+    <h2>サービス</h2>
+    <p>身の回りの困り事をサポートします。</p>
+    <p>まずは<a href="お問い合わせ.html" target="_blank">こちら</a>からご相談ください</p>
+    <p>ご予約は<a href="予約.html" target="_blank">こちら</a>から</p>
+  </section>
+
+  <section id="recruit">
+    <h2>採用情報</h2>
+    <p>＊＊＊</p>
+  </section>
+
+  <section id="contact">
+    <h2>お問い合わせ</h2>
+    <p>お問い合わせは <a href="https://forms.gle/ZhMRmFJTKG2zRPyV9" target="_blank">こちら</a> からも可能です。</p>
+    <div class="form-wrapper">
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScU3UzPji6MzYm7DgjbRfC5nhjshpL5V-U8SlNZfqymAsWSCA/viewform?embedded=true" allowfullscreen>
+        読み込んでいます…
+      </iframe>
+    </div>
+  </section>
+
+  <footer>
+    © 2025 株式会社Re-Light. All Rights Reserved.
+  </footer>
+
+  <!-- スクリプト -->
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const fullMenu = document.getElementById('fullMenu');
+    const closeBtn = document.getElementById('closeBtn');
+    const topBar = document.getElementById('topBar');
+    const menuLabel = document.getElementById('menuLabel');
+
+    menuToggle.addEventListener('click', () => {
+      fullMenu.classList.add('active');
+      topBar.classList.add('hidden');
+      menuLabel.style.display = 'none';
+    });
+
+    closeBtn.addEventListener('click', () => {
+      fullMenu.classList.remove('active');
+      topBar.classList.remove('hidden');
+      menuLabel.style.display = 'block';
+    });
+
+    document.querySelectorAll('.full-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        fullMenu.classList.remove('active');
+        topBar.classList.remove('hidden');
+        menuLabel.style.display = 'block';
+      });
+    });
+  </script>
+
+</body>
+</html>
