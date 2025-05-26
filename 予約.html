@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>予約フォーム</title>
+  <title>日時予約フォーム</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
@@ -35,26 +35,6 @@
     textarea {
       resize: vertical;
     }
-    .time-slot {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .time-btn {
-      flex: 1 1 30%;
-      padding: 10px;
-      background: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.9em;
-    }
-    .time-btn:disabled {
-      background: gray;
-      cursor: not-allowed;
-    }
     button[type="submit"] {
       background: #28a745;
       color: white;
@@ -65,7 +45,7 @@
 </head>
 <body>
 
-<h2>予約フォーム</h2>
+<h2>日時予約フォーム</h2>
 
 <form id="reserveForm">
   <input type="text" name="name" placeholder="氏名" required>
@@ -73,9 +53,7 @@
   <input type="email" name="email" placeholder="メールアドレス" required>
   <textarea name="detail" placeholder="依頼内容" rows="3" required></textarea>
 
-  <input type="text" id="datePicker" placeholder="日付を選択" readonly required>
-  <div id="timeSlots" class="time-slot"></div>
-
+  <input type="text" id="datetimePicker" placeholder="日時を選択" readonly required>
   <input type="hidden" name="date" id="selectedDate">
   <input type="hidden" name="time" id="selectedTime">
 
@@ -83,43 +61,42 @@
 </form>
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
 <script>
 const endpoint = "https://script.google.com/macros/s/AKfycbwJHWOdz5zgDKI9W2bQ_PFFSxTSszEIPUlWs459WalWh1-E3SQz8AI_9WKMJLfwwUPL/exec";
 
-flatpickr("#datePicker", {
-  dateFormat: "Y-m-d",
-  minDate: "today",
+flatpickr("#datetimePicker", {
   locale: "ja",
-  onChange: function(selectedDates, dateStr) {
-    document.getElementById("selectedDate").value = dateStr;
-    fetch(endpoint + "?date=" + dateStr)
-      .then(res => res.json())
-      .then(slots => {
-        const container = document.getElementById("timeSlots");
-        container.innerHTML = "";
-        slots.forEach(time => {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "time-btn";
-          btn.textContent = time;
-          btn.onclick = () => {
-            document.getElementById("selectedTime").value = time;
-            document.querySelectorAll(".time-btn").forEach(b => b.disabled = false);
-            btn.disabled = true;
-          };
-          container.appendChild(btn);
-        });
-      });
+  enableTime: true,
+  time_24hr: true,
+  minuteIncrement: 60,
+  dateFormat: "Y-m-d H:i",
+  minDate: "today",
+  onChange: function(selectedDates, datetimeStr) {
+    const dt = new Date(selectedDates[0]);
+    const yyyy = dt.getFullYear();
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const dd = String(dt.getDate()).padStart(2, '0');
+    const hh = String(dt.getHours()).padStart(2, '0');
+    const mi = String(dt.getMinutes()).padStart(2, '0');
+
+    document.getElementById("selectedDate").value = `${yyyy}-${mm}-${dd}`;
+    document.getElementById("selectedTime").value = `${hh}:${mi}`;
   }
 });
 
 document.getElementById("reserveForm").onsubmit = function(e) {
   e.preventDefault();
+
   const form = e.target;
-  if (!document.getElementById("selectedTime").value) {
-    alert("時間を選択してください。");
+  const date = document.getElementById("selectedDate").value;
+  const time = document.getElementById("selectedTime").value;
+
+  if (!date || !time) {
+    alert("日時を選択してください。");
     return;
   }
+
   const data = new URLSearchParams(new FormData(form));
   fetch(endpoint, {
     method: "POST",
@@ -130,5 +107,14 @@ document.getElementById("reserveForm").onsubmit = function(e) {
     if (result === "OK") {
       alert("予約が完了しました！");
       form.reset();
-      document.getElementById("timeSlots").innerHTML = "";
     } else if (result === "ALREADY_BOOKED") {
+      alert("その日時はすでに予約済みです。別の日時を選択してください。");
+    } else {
+      alert("送信に失敗しました。もう一度お試しください。");
+    }
+  });
+};
+</script>
+
+</body>
+</html>
