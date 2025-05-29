@@ -2,225 +2,71 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>週間予約カレンダー</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>予約フォーム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 10px;
-      background: #f5f5f5;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      text-align: center;
-      padding: 6px;
-      font-size: 0.85em;
-    }
-    th {
-      background: #007BFF;
-      color: white;
-    }
-    button.selectable {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .unavailable {
-      background: #ccc;
-      color: #666;
-      cursor: not-allowed;
-    }
-    #selected {
-      text-align: center;
-      margin: 10px 0;
-      font-weight: bold;
-    }
-    #nav {
-      text-align: center;
-      margin: 10px 0;
-    }
-    input, textarea {
-      width: 100%;
-      margin: 5px 0;
-      padding: 8px;
-      font-size: 1em;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    #formSection {
-      background: white;
-      padding: 10px;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-    #formSection button {
-      width: 100%;
-      background: #007BFF;
-      color: white;
-      font-size: 1em;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      margin-top: 10px;
-    }
+    body { font-family: sans-serif; padding: 1em; }
+    label, select, input, textarea { display: block; margin-bottom: 10px; width: 100%; }
+    .slots button { margin: 5px; }
   </style>
 </head>
 <body>
+  <h1>予約フォーム</h1>
+  <form id="form">
+    <label>氏名 <input name="name" required></label>
+    <label>電話番号 <input name="phone" required></label>
+    <label>メールアドレス <input name="email" type="email" required></label>
+    <label>依頼内容 <textarea name="detail" required></textarea></label>
 
-<h2>週間予約カレンダー</h2>
-
-<div id="nav">
-  <button onclick="moveWeek(-7)">◀ 前の週</button>
-  <span id="rangeTitle"></span>
-  <button onclick="moveWeek(7)">次の週 ▶</button>
-</div>
-
-<div id="selected">選択日時：<span id="selectedDateTime">未選択</span></div>
-
-<table id="calendar"></table>
-
-<div id="formSection">
-  <form id="reserveForm">
-    <input type="text" name="name" placeholder="氏名" required>
-    <input type="tel" name="tel" placeholder="電話番号" required>
-    <input type="email" name="email" placeholder="メールアドレス" required>
-    <textarea name="detail" placeholder="依頼内容" rows="3" required></textarea>
-    <input type="hidden" name="date" id="hiddenDate">
-    <input type="hidden" name="time" id="hiddenTime">
+    <label>日付選択 <input type="date" name="date" id="date" required></label>
+    <div class="slots" id="slots"></div>
+    <input type="hidden" name="time" id="time">
+    
     <button type="submit">送信</button>
   </form>
-</div>
+  <p id="msg"></p>
 
-<script>
-const endpoint = "https://script.google.com/macros/s/AKfycbwJHWOdz5zgDKI9W2bQ_PFFSxTSszEIPUlWs459WalWh1-E3SQz8AI_9WKMJLfwwUPL/exec";
-const hours = Array.from({length: 13}, (_, i) => (9 + i).toString().padStart(2, '0') + ":00");
-let baseDate = new Date(); // 今日を基準
+  <script>
+    const dateInput = document.getElementById('date');
+    const slotsDiv = document.getElementById('slots');
+    const timeInput = document.getElementById('time');
+    const msg = document.getElementById('msg');
 
-function formatDate(d) {
-  return d.toISOString().split("T")[0];
-}
-
-function formatJP(d) {
-  return `${d.getMonth()+1}/${d.getDate()}（日月火水木金土`[d.getDay()] + "）";
-}
-
-function get7Days(fromDate) {
-  const days = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(fromDate);
-    d.setDate(d.getDate() + i);
-    days.push(d);
-  }
-  return days;
-}
-
-function renderCalendar() {
-  const start = new Date(baseDate);
-  start.setHours(0, 0, 0, 0);
-  const days = get7Days(start);
-  document.getElementById("rangeTitle").textContent = `${formatJP(days[0])} 〜 ${formatJP(days[6])}`;
-
-  fetch(endpoint + "?date=" + formatDate(start))
-    .then(res => res.json())
-    .then(reservedList => {
-      const reservedSet = new Set(reservedList.map(item => item.date + "_" + item.time));
-
-      const table = document.getElementById("calendar");
-      table.innerHTML = "";
-
-      // ヘッダー
-      const thead = document.createElement("thead");
-      const headRow = document.createElement("tr");
-      headRow.appendChild(document.createElement("th")); // 時間列
-      days.forEach(d => {
-        const th = document.createElement("th");
-        th.textContent = formatJP(d);
-        headRow.appendChild(th);
-      });
-      thead.appendChild(headRow);
-      table.appendChild(thead);
-
-      // 各時間行
-      const tbody = document.createElement("tbody");
-      hours.forEach(hour => {
-        const row = document.createElement("tr");
-        const th = document.createElement("th");
-        th.textContent = hour;
-        row.appendChild(th);
-
-        days.forEach(day => {
-          const cell = document.createElement("td");
-          const key = formatDate(day) + "_" + hour;
-          if (reservedSet.has(key)) {
-            cell.className = "unavailable";
-            cell.textContent = "×";
-          } else {
-            const btn = document.createElement("button");
-            btn.className = "selectable";
-            btn.textContent = "○";
-            btn.onclick = () => selectDateTime(formatDate(day), hour);
-            cell.appendChild(btn);
-          }
-          row.appendChild(cell);
-        });
-        tbody.appendChild(row);
-      });
-      table.appendChild(tbody);
+    dateInput.addEventListener('change', async () => {
+      const date = dateInput.value;
+      const slots = await google.script.run.withSuccessHandler(showSlots).getAvailableSlots(date);
     });
-}
 
-function selectDateTime(date, time) {
-  document.getElementById("selectedDateTime").textContent = `${date} ${time}`;
-  document.getElementById("hiddenDate").value = date;
-  document.getElementById("hiddenTime").value = time;
-}
-
-function moveWeek(diff) {
-  baseDate.setDate(baseDate.getDate() + diff);
-  renderCalendar();
-}
-
-document.getElementById("reserveForm").onsubmit = function(e) {
-  e.preventDefault();
-  const date = document.getElementById("hiddenDate").value;
-  const time = document.getElementById("hiddenTime").value;
-  if (!date || !time) {
-    alert("日時を選択してください。");
-    return;
-  }
-  const form = e.target;
-  const data = new URLSearchParams(new FormData(form));
-  fetch(endpoint, {
-    method: "POST",
-    body: data
-  }).then(res => res.text()).then(result => {
-    if (result === "OK") {
-      alert("予約が完了しました！");
-      form.reset();
-      document.getElementById("selectedDateTime").textContent = "未選択";
-      renderCalendar();
-    } else if (result === "ALREADY_BOOKED") {
-      alert("その時間はすでに埋まっています。");
-    } else {
-      alert("送信失敗");
+    function showSlots(slots) {
+      slotsDiv.innerHTML = '';
+      if (slots.length === 0) {
+        slotsDiv.textContent = '空き時間はありません';
+        return;
+      }
+      slots.forEach(t => {
+        const btn = document.createElement('button');
+        btn.textContent = t;
+        btn.onclick = () => {
+          timeInput.value = t;
+          Array.from(slotsDiv.children).forEach(b => b.disabled = false);
+          btn.disabled = true;
+        };
+        slotsDiv.appendChild(btn);
+      });
     }
-  });
-};
 
-renderCalendar();
-</script>
-
+    document.getElementById('form').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!timeInput.value) {
+        alert('時間を選択してください');
+        return;
+      }
+      const form = Object.fromEntries(new FormData(e.target).entries());
+      google.script.run.withSuccessHandler(res => {
+        msg.textContent = res;
+        if (res === '予約が完了しました') e.target.reset();
+      }).submitReservation(form);
+    });
+  </script>
 </body>
 </html>
