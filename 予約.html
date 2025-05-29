@@ -7,7 +7,9 @@
   <style>
     body { font-family: sans-serif; padding: 1em; }
     label, select, input, textarea { display: block; margin-bottom: 10px; width: 100%; }
-    .slots button { margin: 5px; }
+    .slots button { margin: 5px; padding: 0.5em 1em; }
+    .slots { display: flex; flex-wrap: wrap; }
+    .slots button.disabled { background-color: #ccc; color: #666; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -19,9 +21,16 @@
     <label>依頼内容 <textarea name="detail" required></textarea></label>
 
     <label>日付選択 <input type="date" name="date" id="date" required></label>
-    <div class="slots" id="slots"></div>
-    <input type="hidden" name="time" id="time">
-    
+
+    <div>
+      <strong>時間を選択</strong>
+      <div class="slots" id="slots">
+        <!-- 9:00〜21:00のボタンを初期表示しておく -->
+        <!-- JSで状態更新 -->
+      </div>
+      <input type="hidden" name="time" id="time">
+    </div>
+
     <button type="submit">送信</button>
   </form>
   <p id="msg"></p>
@@ -32,30 +41,52 @@
     const timeInput = document.getElementById('time');
     const msg = document.getElementById('msg');
 
-    dateInput.addEventListener('change', async () => {
-      const date = dateInput.value;
-      const slots = await google.script.run.withSuccessHandler(showSlots).getAvailableSlots(date);
-    });
+    // 時間リスト定義
+    const timeList = [];
+    for (let h = 9; h <= 21; h++) timeList.push(`${h}:00`);
 
-    function showSlots(slots) {
+    // 時間ボタン描画
+    function renderSlots(selected = '') {
       slotsDiv.innerHTML = '';
-      if (slots.length === 0) {
-        slotsDiv.textContent = '空き時間はありません';
-        return;
-      }
-      slots.forEach(t => {
+      timeList.forEach(t => {
         const btn = document.createElement('button');
+        btn.type = 'button';
         btn.textContent = t;
+        btn.dataset.time = t;
         btn.onclick = () => {
           timeInput.value = t;
-          Array.from(slotsDiv.children).forEach(b => b.disabled = false);
-          btn.disabled = true;
+          document.querySelectorAll('.slots button').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
         };
         slotsDiv.appendChild(btn);
       });
     }
 
-    document.getElementById('form').addEventListener('submit', async e => {
+    // 日付変更時に空き枠を取得し、埋まってるボタンを無効化
+    dateInput.addEventListener('change', async () => {
+      const date = dateInput.value;
+      if (!date) return;
+
+      google.script.run.withSuccessHandler(disableReserved).getAvailableSlots(date);
+    });
+
+    function disableReserved(available) {
+      document.querySelectorAll('.slots button').forEach(btn => {
+        const t = btn.dataset.time;
+        if (!available.includes(t)) {
+          btn.classList.add('disabled');
+          btn.disabled = true;
+        } else {
+          btn.classList.remove('disabled');
+          btn.disabled = false;
+        }
+      });
+    }
+
+    // 初期描画
+    renderSlots();
+
+    document.getElementById('form').addEventListener('submit', e => {
       e.preventDefault();
       if (!timeInput.value) {
         alert('時間を選択してください');
@@ -64,7 +95,10 @@
       const form = Object.fromEntries(new FormData(e.target).entries());
       google.script.run.withSuccessHandler(res => {
         msg.textContent = res;
-        if (res === '予約が完了しました') e.target.reset();
+        if (res === '予約が完了しました') {
+          e.target.reset();
+          renderSlots();
+        }
       }).submitReservation(form);
     });
   </script>
