@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>予約フォーム</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="calendar.js"></script>
+</head>
+<body>
+  <main class="container">
+    <h1>予約フォーム</h1>
+    <form id="reservationForm">
+      <label>氏名<input type="text" name="name" required></label>
+      <label>電話番号<input type="tel" name="tel" required></label>
+      <label>メールアドレス<input type="email" name="email" required></label>
+      <label>依頼内容<textarea name="content" required></textarea></label>
+
+      <div class="calendar-controls">
+        <button type="button" id="prevMonth">＜前の月</button>
+        <span id="calendarTitle"></span>
+        <button type="button" id="nextMonth">次の月＞</button>
+      </div>
+
+      <table id="calendar">
+        <thead>
+          <tr>
+            <th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th>
+          </tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
+
+      <div id="timeSlots"></div>
+
+      <button type="submit">送信</button>
+    </form>
+    <div id="confirmation"></div>
+  </main>
+</body>
+</html>
