@@ -1,98 +1,33 @@
-body {
-  font-family: sans-serif;
-  margin: 0;
-  padding: 1em;
-  background: #f9f9f9;
-}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>予約フォーム</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>予約フォーム</h1>
+    <form id="reservation-form">
+      <label>氏名<input type="text" name="name" required /></label>
+      <label>電話番号<input type="tel" name="phone" required /></label>
+      <label>メールアドレス<input type="email" name="email" required /></label>
+      <label>依頼内容<textarea name="details" required></textarea></label>
 
-main {
-  max-width: 600px;
-  margin: auto;
-  background: white;
-  padding: 1em;
-  border-radius: 10px;
-  box-shadow: 0 0 10px #ccc;
-}
+      <div id="calendar-controls">
+        <button type="button" id="prev-month" class="month-btn">◀</button>
+        <span id="calendar-title"></span>
+        <button type="button" id="next-month" class="month-btn">▶</button>
+      </div>
+      <div id="calendar-container"></div>
 
-label {
-  display: block;
-  margin-top: 1em;
-}
+      <div id="timeslot-container"></div>
 
-input, textarea {
-  width: 100%;
-  padding: 0.5em;
-  margin-top: 0.3em;
-}
-
-button {
-  margin-top: 1em;
-  padding: 0.8em;
-  width: 100%;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-#calendar-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1em;
-  margin: 1em 0;
-}
-
-#calendar-title {
-  font-weight: bold;
-  font-size: 1.2em;
-  min-width: 120px;
-  text-align: center;
-}
-
-.month-btn {
-  padding: 0.3em 0.6em;
-  font-size: 1em;
-  background-color: #eee;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  text-align: center;
-  padding: 0.5em;
-  cursor: pointer;
-}
-
-.sat { color: blue; }
-.sun, .holiday { color: red; }
-
-td.selected {
-  background: yellow;
-}
-
-.timeslot {
-  display: inline-block;
-  padding: 0.5em;
-  margin: 0.3em;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.timeslot.selected {
-  background: yellow;
-}
-
-@media (max-width: 600px) {
-  table, th, td {
-    font-size: 14px;
-  }
-}
+      <button type="submit">予約する</button>
+    </form>
+    <p id="status"></p>
+  </main>
+  <script src="calendar.js"></script>
+</body>
+</html>
