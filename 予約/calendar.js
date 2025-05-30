@@ -62,7 +62,7 @@ function renderTimeSlots(date) {
     .then(res => res.json())
     .then(data => {
       timeSlots.innerHTML = "";
-      const reserved = data.reserved || [];
+      const reserved = data.reserved || ["10:00"];
 
       TIMES.forEach(time => {
         const btn = document.createElement("button");
