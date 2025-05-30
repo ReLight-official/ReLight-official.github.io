@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>予約フォーム</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>予約フォーム</h1>
+    <form id="reservation-form">
+      <label>氏名<input type="text" name="name" required /></label>
+      <label>電話番号<input type="tel" name="phone" required /></label>
+      <label>メールアドレス<input type="email" name="email" required /></label>
+      <label>依頼内容<textarea name="details" required></textarea></label>
 
+      <div id="calendar-controls">
+        <button type="button" id="prev-month" class="month-btn">◀</button>
+        <span id="calendar-title"></span>
+        <button type="button" id="next-month" class="month-btn">▶</button>
+      </div>
+      <div id="calendar-container"></div>
+
+      <div id="timeslot-container"></div>
+
+      <button type="submit">予約する</button>
+    </form>
+    <p id="status"></p>
+  </main>
+  <script src="calendar.js"></script>
+</body>
+</html>
