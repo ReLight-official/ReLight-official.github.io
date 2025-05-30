@@ -4,18 +4,34 @@ body {
   padding: 1em;
   background: #f9f9f9;
 }
+main {
+  max-width: 600px;
+  margin: auto;
+}
 h1 {
   text-align: center;
-}
-form, #reservations {
-  max-width: 500px;
-  margin: auto;
 }
 input, textarea, button {
   width: 100%;
   margin: 0.5em 0;
   padding: 0.8em;
+  font-size: 1em;
 }
 #calendar td.sat { color: blue; }
 #calendar td.sun, #calendar td.holiday { color: red; }
-.selected { background-color: #ffd; }
+.selected {
+  background-color: #ffeeba;
+}
+.time-slot {
+  margin: 0.3em;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  display: inline-block;
+  cursor: pointer;
+}
+.time-slot.selected {
+  background-color: #ffeeba;
+}
+.time-slot.disabled {
+  display: none;
+}
