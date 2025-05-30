@@ -12,8 +12,7 @@
     <div id="reservations"></div>
   </main>
   <script>
-    // スプレッドシートから予約一覧取得＆表示
-    fetch('YOUR_GAS_DEPLOYED_URL?mode=admin')
+    fetch('YOUR_GAS_URL_HERE?mode=admin')
       .then(res => res.json())
       .then(data => {
         const div = document.getElementById("reservations");
