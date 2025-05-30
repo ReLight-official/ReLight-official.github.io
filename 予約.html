@@ -8,26 +8,39 @@
     body { font-family: sans-serif; padding: 1em; max-width: 600px; margin: auto; }
     label, input, textarea { display: block; margin-bottom: 10px; width: 100%; }
     .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin: 1em 0 0.5em; }
-    .weekdays { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
-    .weekdays span { width: 40px; text-align: center; }
-    .calendar { display: flex; flex-wrap: wrap; margin-bottom: 10px; }
+    .calendar-container { margin-bottom: 10px; }
+    .weekdays, .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+    .weekdays span {
+      text-align: center;
+      font-weight: bold;
+    }
     .calendar button, .calendar .spacer {
-      width: 40px; height: 40px; margin: 2px; font-size: 14px;
+      height: 40px;
+      font-size: 14px;
+      text-align: center;
     }
     .calendar button.selected { background-color: orange; color: white; }
-    .calendar .spacer { background: none; border: none; visibility: hidden; }
-
+    .calendar .spacer {
+      visibility: hidden;
+      border: none;
+      background: none;
+    }
     .slots button {
-      margin: 5px; padding: 0.5em 1em;
+      margin: 5px;
+      padding: 0.5em 1em;
     }
     .slots button.disabled {
-      background-color: #ccc; color: #666;
+      background: #ccc; color: #666;
       pointer-events: none;
     }
-
     @media (max-width: 480px) {
       .calendar button, .calendar .spacer, .weekdays span {
-        width: 30px; height: 30px; font-size: 12px;
+        font-size: 12px;
+        height: 30px;
       }
     }
   </style>
@@ -46,16 +59,18 @@
       <button type="button" id="nextMonth">次月 ▶</button>
     </div>
 
-    <div class="weekdays">
-      <span style="color:red;">日</span>
-      <span>月</span>
-      <span>火</span>
-      <span>水</span>
-      <span>木</span>
-      <span>金</span>
-      <span style="color:blue;">土</span>
+    <div class="calendar-container">
+      <div class="weekdays">
+        <span style="color:red;">日</span>
+        <span>月</span>
+        <span>火</span>
+        <span>水</span>
+        <span>木</span>
+        <span>金</span>
+        <span style="color:blue;">土</span>
+      </div>
+      <div class="calendar" id="calendar"></div>
     </div>
-    <div class="calendar" id="calendar"></div>
 
     <p>選択日：<span id="selected-date-text">未選択</span></p>
 
