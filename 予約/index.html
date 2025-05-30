@@ -9,25 +9,19 @@
 <body>
   <main>
     <h1>予約フォーム</h1>
-    <form id="reservation-form">
-      <label>氏名<input type="text" name="name" required /></label>
-      <label>電話番号<input type="tel" name="phone" required /></label>
-      <label>メールアドレス<input type="email" name="email" required /></label>
-      <label>依頼内容<textarea name="details" required></textarea></label>
+    <form id="reserveForm">
+      <input type="text" name="name" placeholder="氏名" required />
+      <input type="tel" name="phone" placeholder="電話番号" required />
+      <input type="email" name="email" placeholder="メールアドレス" required />
+      <textarea name="details" placeholder="依頼内容" required></textarea>
 
-      <div id="calendar-controls">
-        <button type="button" id="prev-month" class="month-btn">◀</button>
-        <span id="calendar-title"></span>
-        <button type="button" id="next-month" class="month-btn">▶</button>
-      </div>
-      <div id="calendar-container"></div>
+      <div id="calendar"></div>
+      <div id="timeslots"></div>
 
-      <div id="timeslot-container"></div>
-
-      <button type="submit">予約する</button>
+      <button type="submit">送信</button>
     </form>
-    <p id="status"></p>
+    <p id="message"></p>
   </main>
-  <script src="calendar.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
