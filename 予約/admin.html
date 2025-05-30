@@ -1,1 +1,29 @@
-
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>予約管理</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>予約一覧</h1>
+    <div id="reservations"></div>
+  </main>
+  <script>
+    // スプレッドシートから予約一覧取得＆表示
+    fetch('YOUR_GAS_DEPLOYED_URL?mode=admin')
+      .then(res => res.json())
+      .then(data => {
+        const div = document.getElementById("reservations");
+        data.forEach(entry => {
+          const p = document.createElement("p");
+          p.textContent = `${entry.date} ${entry.time} - ${entry.name}`;
+          if (entry.status === 'キャンセル') p.style.color = "#aaa";
+          div.appendChild(p);
+        });
+      });
+  </script>
+</body>
+</html>
