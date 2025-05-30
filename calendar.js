@@ -1,7 +1,7 @@
 let currentDate = new Date();
 let selectedDate = null;
 let selectedTime = null;
-const holidays = []; // 祝日を追加する場合は ["1/1", "5/3", ...] の形式で記述
+const holidays = [];
 
 const calendarTitle = document.getElementById('calendar-title');
 const calendarContainer = document.getElementById('calendar-container');
@@ -92,19 +92,47 @@ document.getElementById('reservation-form').onsubmit = function (e) {
     return;
   }
 
+  // フロント側の重複チェック
   const emailKey = `user_${email}`;
   if (localStorage.getItem(emailKey)) {
     alert("すでに予約があります（1件のみ）");
     return;
   }
 
-  const reservationKey = `${selectedDate.toDateString()}_${selectedTime}`;
-  localStorage.setItem(reservationKey, JSON.stringify({ name, phone, email, details }));
-  localStorage.setItem(emailKey, reservationKey);
+  const dateStr = selectedDate.toLocaleDateString('ja-JP');
+  const payload = {
+    name,
+    phone,
+    email,
+    details,
+    date: dateStr,
+    time: selectedTime
+  };
 
-  document.getElementById("status").innerText = "予約を完了しました！";
-  renderTimeslots();
-  this.reset();
+  fetch('https://script.google.com/macros/s/AKfycbz7-kKRMDlKY0eIJTlhfsdkYMhA2WFdVKPzZLwOUzGIDg8YR-PQTJrzty1gGD6TVWn-WQ/exec', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.status === 'duplicate') {
+      alert("すでに予約があります（1件のみ）");
+    } else if (res.status === 'success') {
+      const reservationKey = `${selectedDate.toDateString()}_${selectedTime}`;
+      localStorage.setItem(reservationKey, JSON.stringify(payload));
+      localStorage.setItem(emailKey, reservationKey);
+      document.getElementById("status").innerText = "予約を受け付けました。メールをご確認ください。";
+      this.reset();
+      renderTimeslots();
+    } else {
+      alert("送信に失敗しました");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("通信エラーが発生しました");
+  });
 };
 
 renderCalendar();
