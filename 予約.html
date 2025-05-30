@@ -10,6 +10,7 @@
     label { display: block; margin-top: 1em; }
     input, textarea { width: 100%; padding: 0.5em; margin-top: 0.3em; }
     button { margin-top: 1em; width: 100%; padding: 1em; background: #4CAF50; color: white; border: none; border-radius: 5px; }
+    .calendar-nav { display: flex; justify-content: space-between; margin-top: 1em; }
     .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3em; margin-top: 1em; text-align: center; }
     .day { padding: 0.5em; cursor: pointer; border-radius: 5px; }
     .day:hover { background: #ddd; }
@@ -30,6 +31,12 @@
       <label>メールアドレス<input type="email" name="email" required></label>
       <label>依頼内容<textarea name="details" required></textarea></label>
 
+      <div class="calendar-nav">
+        <button type="button" onclick="changeMonth(-1)">&lt; 前月</button>
+        <div id="calendar-title"></div>
+        <button type="button" onclick="changeMonth(1)">翌月 &gt;</button>
+      </div>
+
       <div id="calendar" class="calendar"></div>
       <div id="timeslots"></div>
 
@@ -40,20 +47,25 @@
 
   <script>
     const calendarEl = document.getElementById("calendar");
+    const calendarTitleEl = document.getElementById("calendar-title");
     const timeslotsEl = document.getElementById("timeslots");
     const statusEl = document.getElementById("status");
     let selectedDate = null;
     let selectedTime = null;
     let reserved = {};
+    let monthOffset = 0;
 
-    const holidays = ["2025-01-01", "2025-05-03", "2025-12-23"]; // 例
+    const holidays = ["2025-01-01", "2025-05-03", "2025-12-23"];
 
-    function renderCalendar(monthOffset = 0) {
+    function renderCalendar() {
       const today = new Date();
       const year = today.getFullYear();
-      const month = today.getMonth() + monthOffset;
-      const date = new Date(year, month, 1);
+      const baseDate = new Date(year, today.getMonth() + monthOffset, 1);
+      const month = baseDate.getMonth();
+      const currentYear = baseDate.getFullYear();
+      const date = new Date(currentYear, month, 1);
 
+      calendarTitleEl.textContent = `${currentYear}年${month + 1}月`;
       calendarEl.innerHTML = "";
 
       const weekdayNames = ["日", "月", "火", "水", "木", "金", "土"];
@@ -68,7 +80,7 @@
         calendarEl.appendChild(empty);
       }
 
-      while (date.getMonth() === month % 12) {
+      while (date.getMonth() === month) {
         const dayDiv = document.createElement("div");
         const ymd = date.toISOString().slice(0, 10);
         dayDiv.textContent = date.getDate();
@@ -88,6 +100,13 @@
         calendarEl.appendChild(dayDiv);
         date.setDate(date.getDate() + 1);
       }
+    }
+
+    function changeMonth(offset) {
+      monthOffset += offset;
+      renderCalendar();
+      timeslotsEl.innerHTML = "";
+      selectedDate = null;
     }
 
     function renderTimeSlots() {
@@ -129,7 +148,6 @@
       const details = form.details.value;
       const key = `${selectedDate} ${selectedTime}`;
 
-      // ここで重複予約チェック＆登録処理
       if (Object.values(reserved).some(r => r.email === email)) {
         alert("すでに予約が存在します。");
         return;
