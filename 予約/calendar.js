@@ -1,3 +1,5 @@
+// calendar.js - 完全版
+
 const calendarTitle = document.getElementById("calendarTitle");
 const calendarBody = document.getElementById("calendarBody");
 const prevMonthBtn = document.getElementById("prevMonth");
@@ -9,7 +11,7 @@ let currentDate = new Date();
 let selectedDate = null;
 let selectedTime = null;
 
-const TIMES = Array.from({length: 13}, (_, i) => `${9 + i}:00`);
+const TIMES = Array.from({ length: 13 }, (_, i) => `${9 + i}:00`);
 
 function renderCalendar(date) {
   calendarBody.innerHTML = "";
@@ -53,29 +55,33 @@ function renderCalendar(date) {
 }
 
 function renderTimeSlots(date) {
-  timeSlots.innerHTML = "";
-  // ここで実際の予約状況を取得する処理に置換予定
-  const reserved = getReservedTimes(date); // 仮関数
+  timeSlots.innerHTML = "読み込み中...";
+  const formattedDate = date.toLocaleDateString("ja-JP");
 
-  TIMES.forEach(time => {
-    const btn = document.createElement("button");
-    btn.textContent = time;
-    if (reserved.includes(time)) {
-      btn.disabled = true;
-    } else {
-      btn.onclick = () => {
-        selectedTime = time;
-        [...timeSlots.querySelectorAll("button")].forEach(b => b.classList.remove("selected"));
-        btn.classList.add("selected");
-      };
-    }
-    timeSlots.appendChild(btn);
-  });
-}
+  fetch(`https://script.google.com/macros/s/AKfycbxGfhChEllFyPnKnvsWF_-DwApowyv8ahrPbRif-uSQUataTdMMF7Z8SlaGv7vx50-AnA/exec?date=${encodeURIComponent(formattedDate)}`)
+    .then(res => res.json())
+    .then(data => {
+      timeSlots.innerHTML = "";
+      const reserved = data.reserved || [];
 
-function getReservedTimes(date) {
-  // 仮: 予約されている時間枠（本来はスプレッドシート/API等から取得）
-  return ["13:00", "15:00"];
+      TIMES.forEach(time => {
+        const btn = document.createElement("button");
+        btn.textContent = time;
+        if (reserved.includes(time)) {
+          btn.disabled = true;
+        } else {
+          btn.onclick = () => {
+            selectedTime = time;
+            [...timeSlots.querySelectorAll("button")].forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+          };
+        }
+        timeSlots.appendChild(btn);
+      });
+    })
+    .catch(() => {
+      timeSlots.innerHTML = "時間帯の取得に失敗しました。";
+    });
 }
 
 prevMonthBtn.onclick = () => {
@@ -94,15 +100,32 @@ form.onsubmit = (e) => {
     alert("日付と時間を選択してください。");
     return;
   }
+
   const data = new FormData(form);
-  const summary = `■氏名: ${data.get("name")}
-■電話番号: ${data.get("tel")}
-■メールアドレス: ${data.get("email")}
-■依頼内容: ${data.get("content")}
-■予約日程: ${selectedDate.toLocaleDateString()} ${selectedTime}\n■キャンセル用リンク: [ここにキャンセルリンク]`;
-  alert("予約が送信されました:\n" + summary);
-  form.reset();
-  timeSlots.innerHTML = "";
+  const json = {
+    name: data.get("name"),
+    tel: data.get("tel"),
+    email: data.get("email"),
+    content: data.get("content"),
+    date: selectedDate.toLocaleDateString("ja-JP"),
+    time: selectedTime
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbxGfhChEllFyPnKnvsWF_-DwApowyv8ahrPbRif-uSQUataTdMMF7Z8SlaGv7vx50-AnA/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(json)
+  })
+    .then(res => res.json())
+    .then(result => {
+      if (result.success) {
+        alert("予約が確定しました！");
+        form.reset();
+        timeSlots.innerHTML = "";
+      } else {
+        alert("予約できません：" + result.message);
+      }
+    });
 };
 
 renderCalendar(currentDate);
