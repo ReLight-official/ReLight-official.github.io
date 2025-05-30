@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -15,6 +16,11 @@
       <input type="email" name="email" placeholder="メールアドレス" required />
       <textarea name="details" placeholder="依頼内容" required></textarea>
 
+      <div id="calendar-controls">
+        <button type="button" id="prev-month">前の月</button>
+        <span id="current-month"></span>
+        <button type="button" id="next-month">次の月</button>
+      </div>
       <div id="calendar"></div>
       <div id="timeslots"></div>
 
