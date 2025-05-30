@@ -62,11 +62,14 @@ function renderTimeSlots(date) {
     .then(res => res.json())
     .then(data => {
       timeSlots.innerHTML = "";
-      const reserved = data.reserved || ["10:00"];
+      const reserved = data.reserved || [];
 
-      TIMES.forEach(time => {
+      // 9:00〜21:00（1時間毎）
+      for (let hour = 9; hour <= 21; hour++) {
+        const time = `${hour}:00`;
         const btn = document.createElement("button");
         btn.textContent = time;
+
         if (reserved.includes(time)) {
           btn.disabled = true;
         } else {
@@ -76,8 +79,9 @@ function renderTimeSlots(date) {
             btn.classList.add("selected");
           };
         }
+
         timeSlots.appendChild(btn);
-      });
+      }
     })
     .catch(() => {
       timeSlots.innerHTML = "時間帯の取得に失敗しました。";
