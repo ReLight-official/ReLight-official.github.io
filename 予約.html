@@ -23,20 +23,30 @@
       font-size: 14px;
       text-align: center;
     }
-    .calendar button.selected { background-color: orange; color: white; }
     .calendar .spacer {
       visibility: hidden;
       border: none;
       background: none;
     }
+
+    .slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
     .slots button {
-      margin: 5px;
       padding: 0.5em 1em;
     }
     .slots button.disabled {
       background: #ccc; color: #666;
       pointer-events: none;
     }
+
+    .selected {
+      background-color: orange;
+      color: white;
+    }
+
     @media (max-width: 480px) {
       .calendar button, .calendar .spacer, .weekdays span {
         font-size: 12px;
