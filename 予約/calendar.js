@@ -1,4 +1,4 @@
-// calendar.js - 完全版
+// calendar.js - 完全版（予約済み時間をスプレッドシートから取得して非表示）
 
 const calendarTitle = document.getElementById("calendarTitle");
 const calendarBody = document.getElementById("calendarBody");
@@ -10,8 +10,6 @@ const form = document.getElementById("reservationForm");
 let currentDate = new Date();
 let selectedDate = null;
 let selectedTime = null;
-
-const TIMES = Array.from({ length: 13 }, (_, i) => `${9 + i}:00`);
 
 function renderCalendar(date) {
   calendarBody.innerHTML = "";
@@ -64,7 +62,6 @@ function renderTimeSlots(date) {
       timeSlots.innerHTML = "";
       const reserved = data.reserved || [];
 
-      // 9:00〜21:00（1時間毎）
       for (let hour = 9; hour <= 21; hour++) {
         const time = `${hour}:00`;
         const btn = document.createElement("button");
