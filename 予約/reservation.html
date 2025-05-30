@@ -6,6 +6,22 @@
   <title>予約フォーム</title>
   <link rel="stylesheet" href="style.css">
   <script defer src="calendar.js"></script>
+  <style>
+    .calendar-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5em;
+      margin: 1em 0;
+    }
+    .calendar-controls button {
+      padding: 0.25em 0.5em;
+      font-size: 0.9em;
+    }
+    .calendar-controls span {
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <main class="container">
@@ -17,9 +33,9 @@
       <label>依頼内容<textarea name="content" required></textarea></label>
 
       <div class="calendar-controls">
-        <button type="button" id="prevMonth">＜前の月</button>
+        <button type="button" id="prevMonth">＜</button>
         <span id="calendarTitle"></span>
-        <button type="button" id="nextMonth">次の月＞</button>
+        <button type="button" id="nextMonth">＞</button>
       </div>
 
       <table id="calendar">
