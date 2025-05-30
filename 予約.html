@@ -1,165 +1,98 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>予約フォーム</title>
-  <style>
-    body { font-family: sans-serif; margin: 0; padding: 1em; background: #f7f7f7; }
-    main { max-width: 600px; margin: auto; background: #fff; padding: 1em; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    label { display: block; margin-top: 1em; }
-    input, textarea { width: 100%; padding: 0.5em; margin-top: 0.3em; }
-    button { margin-top: 1em; width: 100%; padding: 1em; background: #4CAF50; color: white; border: none; border-radius: 5px; }
-    .calendar-nav { display: flex; justify-content: space-between; margin-top: 1em; }
-    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3em; margin-top: 1em; text-align: center; }
-    .day { padding: 0.5em; cursor: pointer; border-radius: 5px; }
-    .day:hover { background: #ddd; }
-    .selected-date { background: #ffcc00 !important; }
-    .sun { color: red; }
-    .sat { color: blue; }
-    .timeslot { display: inline-block; padding: 0.5em; margin: 0.2em; border: 1px solid #aaa; border-radius: 5px; cursor: pointer; }
-    .timeslot.unavailable { display: none; }
-    .timeslot.selected { background: #ffcc00; }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>予約フォーム</h1>
-    <form id="reservation-form">
-      <label>氏名<input type="text" name="name" required></label>
-      <label>電話番号<input type="tel" name="phone" required></label>
-      <label>メールアドレス<input type="email" name="email" required></label>
-      <label>依頼内容<textarea name="details" required></textarea></label>
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 1em;
+  background: #f9f9f9;
+}
 
-      <div class="calendar-nav">
-        <button type="button" onclick="changeMonth(-1)">&lt; 前月</button>
-        <div id="calendar-title"></div>
-        <button type="button" onclick="changeMonth(1)">翌月 &gt;</button>
-      </div>
+main {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 1em;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ccc;
+}
 
-      <div id="calendar" class="calendar"></div>
-      <div id="timeslots"></div>
+label {
+  display: block;
+  margin-top: 1em;
+}
 
-      <button type="submit">予約する</button>
-    </form>
-    <p id="status"></p>
-  </main>
+input, textarea {
+  width: 100%;
+  padding: 0.5em;
+  margin-top: 0.3em;
+}
 
-  <script>
-    const calendarEl = document.getElementById("calendar");
-    const calendarTitleEl = document.getElementById("calendar-title");
-    const timeslotsEl = document.getElementById("timeslots");
-    const statusEl = document.getElementById("status");
-    let selectedDate = null;
-    let selectedTime = null;
-    let reserved = {};
-    let monthOffset = 0;
+button {
+  margin-top: 1em;
+  padding: 0.8em;
+  width: 100%;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    const holidays = ["2025-01-01", "2025-05-03", "2025-12-23"];
+#calendar-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+  margin: 1em 0;
+}
 
-    function renderCalendar() {
-      const today = new Date();
-      const year = today.getFullYear();
-      const baseDate = new Date(year, today.getMonth() + monthOffset, 1);
-      const month = baseDate.getMonth();
-      const currentYear = baseDate.getFullYear();
-      const date = new Date(currentYear, month, 1);
+#calendar-title {
+  font-weight: bold;
+  font-size: 1.2em;
+  min-width: 120px;
+  text-align: center;
+}
 
-      calendarTitleEl.textContent = `${currentYear}年${month + 1}月`;
-      calendarEl.innerHTML = "";
+.month-btn {
+  padding: 0.3em 0.6em;
+  font-size: 1em;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-      const weekdayNames = ["日", "月", "火", "水", "木", "金", "土"];
-      for (let i = 0; i < 7; i++) {
-        const div = document.createElement("div");
-        div.innerHTML = weekdayNames[i];
-        calendarEl.appendChild(div);
-      }
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-      for (let i = 0; i < date.getDay(); i++) {
-        const empty = document.createElement("div");
-        calendarEl.appendChild(empty);
-      }
+th, td {
+  text-align: center;
+  padding: 0.5em;
+  cursor: pointer;
+}
 
-      while (date.getMonth() === month) {
-        const dayDiv = document.createElement("div");
-        const ymd = date.toISOString().slice(0, 10);
-        dayDiv.textContent = date.getDate();
-        dayDiv.className = "day";
+.sat { color: blue; }
+.sun, .holiday { color: red; }
 
-        if (date.getDay() === 0) dayDiv.classList.add("sun");
-        if (date.getDay() === 6) dayDiv.classList.add("sat");
-        if (holidays.includes(ymd)) dayDiv.classList.add("sun");
+td.selected {
+  background: yellow;
+}
 
-        dayDiv.onclick = () => {
-          selectedDate = ymd;
-          document.querySelectorAll(".day").forEach(d => d.classList.remove("selected-date"));
-          dayDiv.classList.add("selected-date");
-          renderTimeSlots();
-        };
+.timeslot {
+  display: inline-block;
+  padding: 0.5em;
+  margin: 0.3em;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-        calendarEl.appendChild(dayDiv);
-        date.setDate(date.getDate() + 1);
-      }
-    }
+.timeslot.selected {
+  background: yellow;
+}
 
-    function changeMonth(offset) {
-      monthOffset += offset;
-      renderCalendar();
-      timeslotsEl.innerHTML = "";
-      selectedDate = null;
-    }
-
-    function renderTimeSlots() {
-      timeslotsEl.innerHTML = "";
-      if (!selectedDate) return;
-
-      for (let hour = 9; hour <= 21; hour++) {
-        const timeStr = `${hour}:00`;
-        const key = `${selectedDate} ${timeStr}`;
-        const div = document.createElement("div");
-        div.textContent = timeStr;
-        div.className = "timeslot";
-
-        if (reserved[key]) {
-          div.classList.add("unavailable");
-        } else {
-          div.onclick = () => {
-            selectedTime = timeStr;
-            document.querySelectorAll(".timeslot").forEach(t => t.classList.remove("selected"));
-            div.classList.add("selected");
-          };
-        }
-
-        timeslotsEl.appendChild(div);
-      }
-    }
-
-    document.getElementById("reservation-form").onsubmit = async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      if (!selectedDate || !selectedTime) {
-        alert("日付と時間を選択してください");
-        return;
-      }
-
-      const name = form.name.value;
-      const phone = form.phone.value;
-      const email = form.email.value;
-      const details = form.details.value;
-      const key = `${selectedDate} ${selectedTime}`;
-
-      if (Object.values(reserved).some(r => r.email === email)) {
-        alert("すでに予約が存在します。");
-        return;
-      }
-
-      reserved[key] = { name, phone, email, details };
-      alert("予約が完了しました。確認メールを送信します。");
-      renderTimeSlots();
-      form.reset();
-    };
-
-    renderCalendar();
-  </script>
-</body>
-</html>
+@media (max-width: 600px) {
+  table, th, td {
+    font-size: 14px;
+  }
+}
