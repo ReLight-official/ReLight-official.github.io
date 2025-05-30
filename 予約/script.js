@@ -1,85 +1,56 @@
-let selectedDate = '';
+et selectedDate = '';
 let selectedTime = '';
+let currentMonth = new Date();
 
-document.addEventListener("DOMContentLoaded", () => {
-  generateCalendar();
-  setupForm();
-});
-
-function generateCalendar() {
+function renderCalendar(monthDate) {
   const calendar = document.getElementById("calendar");
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth(); // 0-based
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
 
-  const date = new Date(year, month, 1);
-  const days = [];
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
 
-  while (date.getMonth() === month) {
-    days.push(new Date(date));
-    date.setDate(date.getDate() + 1);
+  let html = `<table><thead>
+    <tr><th colspan="7">
+      <button type="button" id="prev-month">前の月</button>
+      <span id="current-month">${year}年${month + 1}月</span>
+      <button type="button" id="next-month">次の月</button>
+    </th></tr>
+    <tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr>
+  </thead><tbody><tr>`;
+
+  for (let i = 0; i < firstDay.getDay(); i++) html += '<td></td>';
+
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const date = new Date(year, month, day);
+    const dayOfWeek = date.getDay();
+    html += `<td class="${dayOfWeek === 6 ? 'sat' : ''}${dayOfWeek === 0 ? 'sun' : ''}" data-date="${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}">${day}</td>`;
+    if (dayOfWeek === 6 && day !== lastDay.getDate()) html += '</tr><tr>';
   }
+  html += '</tr></tbody></table>';
+  calendar.innerHTML = html;
 
-  const table = document.createElement("table");
-  const tr = document.createElement("tr");
-  days.forEach(d => {
-    const td = document.createElement("td");
-    td.textContent = d.getDate();
-    if (d.getDay() === 6) td.classList.add("sat");
-    if (d.getDay() === 0) td.classList.add("sun");
+  document.querySelectorAll("#calendar td[data-date]").forEach(td => {
     td.onclick = () => {
-      selectedDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
-      document.querySelectorAll("#calendar td").forEach(td => td.classList.remove("selected"));
+      selectedDate = td.dataset.date;
+      document.querySelectorAll("#calendar td").forEach(el => el.classList.remove("selected"));
       td.classList.add("selected");
       renderTimeSlots();
     };
-    tr.appendChild(td);
-  });
-  table.appendChild(tr);
-  calendar.innerHTML = "";
-  calendar.appendChild(table);
-}
-
-function renderTimeSlots() {
-  const times = Array.from({ length: 13 }, (_, i) => `${i + 9}:00`);
-  const container = document.getElementById("timeslots");
-  container.innerHTML = "";
-
-  times.forEach(t => {
-    const div = document.createElement("div");
-    div.className = "time-slot";
-    div.textContent = t;
-    div.onclick = () => {
-      selectedTime = t;
-      document.querySelectorAll(".time-slot").forEach(e => e.classList.remove("selected"));
-      div.classList.add("selected");
-    };
-    container.appendChild(div);
   });
 
-  // TODO: 予約済み時間帯をGASから取得して非表示にする
-}
+  document.getElementById("prev-month").onclick = () => {
+    currentMonth.setMonth(currentMonth.getMonth() - 1);
+    renderCalendar(currentMonth);
+  };
 
-function setupForm() {
-  document.getElementById("reserveForm").onsubmit = (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const data = {
-      name: form.name.value,
-      phone: form.phone.value,
-      email: form.email.value,
-      details: form.details.value,
-      date: selectedDate,
-      time: selectedTime
-    };
-
-    fetch("YOUR_GAS_URL_HERE", {
-      method: "POST",
-      body: JSON.stringify(data)
-    })
-      .then(res => res.text())
-      .then(txt => {
-        document.getElementById("message").textContent = txt === "OK" ? "予約完了しました。" : "予約に失敗しました：" + txt;
-      });
+  document.getElementById("next-month").onclick = () => {
+    currentMonth.setMonth(currentMonth.getMonth() + 1);
+    renderCalendar(currentMonth);
   };
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderCalendar(currentMonth);
+  setupForm();
+});
