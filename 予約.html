@@ -5,102 +5,167 @@
   <title>予約フォーム</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: sans-serif; padding: 1em; }
-    label, select, input, textarea { display: block; margin-bottom: 10px; width: 100%; }
-    .slots button { margin: 5px; padding: 0.5em 1em; }
-    .slots { display: flex; flex-wrap: wrap; }
-    .slots button.disabled { background-color: #ccc; color: #666; pointer-events: none; }
+    body { font-family: sans-serif; padding: 1em; max-width: 600px; margin: auto; }
+    label, input, textarea { display: block; margin-bottom: 10px; width: 100%; }
+    .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin: 1em 0 0.5em; }
+    .weekdays { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
+    .weekdays span { width: 40px; text-align: center; }
+    .calendar { display: flex; flex-wrap: wrap; margin-bottom: 10px; }
+    .calendar button, .calendar .spacer {
+      width: 40px; height: 40px; margin: 2px; font-size: 14px;
+    }
+    .calendar button.selected { background-color: orange; color: white; }
+    .calendar .spacer { background: none; border: none; visibility: hidden; }
+
+    .slots button {
+      margin: 5px; padding: 0.5em 1em;
+    }
+    .slots button.disabled {
+      background-color: #ccc; color: #666;
+      pointer-events: none;
+    }
+
+    @media (max-width: 480px) {
+      .calendar button, .calendar .spacer, .weekdays span {
+        width: 30px; height: 30px; font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>予約フォーム</h1>
+  <h2>予約フォーム</h2>
   <form id="form">
     <label>氏名 <input name="name" required></label>
     <label>電話番号 <input name="phone" required></label>
     <label>メールアドレス <input name="email" type="email" required></label>
     <label>依頼内容 <textarea name="detail" required></textarea></label>
 
-    <label>日付選択 <input type="date" name="date" id="date" required></label>
+    <div class="calendar-nav">
+      <button type="button" id="prevMonth">◀ 前月</button>
+      <strong id="calendarTitle"></strong>
+      <button type="button" id="nextMonth">次月 ▶</button>
+    </div>
+
+    <div class="weekdays">
+      <span style="color:red;">日</span>
+      <span>月</span>
+      <span>火</span>
+      <span>水</span>
+      <span>木</span>
+      <span>金</span>
+      <span style="color:blue;">土</span>
+    </div>
+    <div class="calendar" id="calendar"></div>
+
+    <p>選択日：<span id="selected-date-text">未選択</span></p>
 
     <div>
       <strong>時間を選択</strong>
-      <div class="slots" id="slots">
-        <!-- 9:00〜21:00のボタンを初期表示しておく -->
-        <!-- JSで状態更新 -->
-      </div>
-      <input type="hidden" name="time" id="time">
+      <div class="slots" id="slots"></div>
     </div>
+
+    <input type="hidden" name="date" id="date">
+    <input type="hidden" name="time" id="time">
 
     <button type="submit">送信</button>
   </form>
   <p id="msg"></p>
 
   <script>
+    const calendar = document.getElementById('calendar');
+    const calendarTitle = document.getElementById('calendarTitle');
+    const selectedDateText = document.getElementById('selected-date-text');
     const dateInput = document.getElementById('date');
-    const slotsDiv = document.getElementById('slots');
     const timeInput = document.getElementById('time');
-    const msg = document.getElementById('msg');
+    const slotsDiv = document.getElementById('slots');
+    let current = new Date();
 
-    // 時間リスト定義
     const timeList = [];
     for (let h = 9; h <= 21; h++) timeList.push(`${h}:00`);
 
-    // 時間ボタン描画
-    function renderSlots(selected = '') {
-      slotsDiv.innerHTML = '';
-      timeList.forEach(t => {
+    function drawCalendar() {
+      const year = current.getFullYear();
+      const month = current.getMonth();
+      calendar.innerHTML = '';
+      calendarTitle.textContent = `${year}年${month + 1}月`;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for (let i = 0; i < firstDay; i++) {
+        const spacer = document.createElement('div');
+        spacer.className = 'spacer';
+        calendar.appendChild(spacer);
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.textContent = t;
-        btn.dataset.time = t;
+        btn.textContent = d;
         btn.onclick = () => {
-          timeInput.value = t;
-          document.querySelectorAll('.slots button').forEach(b => b.classList.remove('selected'));
+          document.querySelectorAll('.calendar button').forEach(b => b.classList.remove('selected'));
           btn.classList.add('selected');
+          selectedDateText.textContent = dateStr;
+          dateInput.value = dateStr;
+          loadSlots(dateStr);
         };
-        slotsDiv.appendChild(btn);
-      });
+        calendar.appendChild(btn);
+      }
     }
 
-    // 日付変更時に空き枠を取得し、埋まってるボタンを無効化
-    dateInput.addEventListener('change', async () => {
-      const date = dateInput.value;
-      if (!date) return;
-
-      google.script.run.withSuccessHandler(disableReserved).getAvailableSlots(date);
-    });
-
-    function disableReserved(available) {
-      document.querySelectorAll('.slots button').forEach(btn => {
-        const t = btn.dataset.time;
-        if (!available.includes(t)) {
-          btn.classList.add('disabled');
-          btn.disabled = true;
-        } else {
-          btn.classList.remove('disabled');
-          btn.disabled = false;
-        }
-      });
+    function loadSlots(dateStr) {
+      google.script.run.withSuccessHandler(available => {
+        slotsDiv.innerHTML = '';
+        timeList.forEach(t => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = t;
+          btn.dataset.time = t;
+          if (!available.includes(t)) {
+            btn.classList.add('disabled');
+            btn.disabled = true;
+          }
+          btn.onclick = () => {
+            timeInput.value = t;
+            document.querySelectorAll('.slots button').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+          };
+          slotsDiv.appendChild(btn);
+        });
+      }).getAvailableSlots(dateStr);
     }
 
-    // 初期描画
-    renderSlots();
+    document.getElementById('prevMonth').onclick = () => {
+      current.setMonth(current.getMonth() - 1);
+      drawCalendar();
+    };
+    document.getElementById('nextMonth').onclick = () => {
+      current.setMonth(current.getMonth() + 1);
+      drawCalendar();
+    };
 
     document.getElementById('form').addEventListener('submit', e => {
       e.preventDefault();
-      if (!timeInput.value) {
-        alert('時間を選択してください');
+      if (!dateInput.value || !timeInput.value) {
+        alert('日付と時間を選択してください');
         return;
       }
       const form = Object.fromEntries(new FormData(e.target).entries());
       google.script.run.withSuccessHandler(res => {
-        msg.textContent = res;
+        document.getElementById('msg').textContent = res;
         if (res === '予約が完了しました') {
           e.target.reset();
-          renderSlots();
+          dateInput.value = '';
+          timeInput.value = '';
+          selectedDateText.textContent = '未選択';
+          drawCalendar();
+          slotsDiv.innerHTML = '';
         }
       }).submitReservation(form);
     });
+
+    drawCalendar();
   </script>
 </body>
 </html>
