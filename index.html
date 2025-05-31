@@ -5,252 +5,354 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>株式会社Re-Light</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --header-bg: #f0f0f0;
+      --notice-bg: #f9f9f9;
+      --highlight-color: yellow;
+      --badge-bg: red;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #121212;
+        --text-color: #e0e0e0;
+        --header-bg: #1f1f1f;
+        --notice-bg: #2a2a2a;
+        --highlight-color: #ffee58;
+        --badge-bg: orange;
+      }
     }
 
     body {
+      margin: 0;
       font-family: sans-serif;
-      scroll-behavior: smooth;
-    }
-
-    /* ☰とMENU */
-    .top-bar {
-      background-color: #000;
-      color: white;
-      text-align: right;
-      padding: 10px 20px;
-      position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 1000;
-    }
-
-    .top-bar .menu-toggle {
-      font-size: 26px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-
-    .top-bar.hidden {
-      display: none;
-    }
-
-    .menu-label {
-      text-align: right;
-      padding: 0 20px 10px;
-      color: white;
-      background-color: #000;
-      font-size: 12px;
-      position: fixed;
-      top: 50px;
-      width: 100%;
-      z-index: 999;
+      background-color: var(--bg-color);
+      color: var(--text-color);
     }
 
     header {
-      background-color: #000;
-      text-align: center;
-      padding: 80px 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--header-bg);
+      padding: 12px 16px;
+      border-bottom: 1px solid #666;
     }
 
-    header img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    /* フルスクリーンメニュー */
-    .full-menu {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.9);
-      color: white;
-      overflow-y: auto;
-      z-index: 2000;
-      padding-top: 80px;
-      text-align: center;
-    }
-
-    .full-menu.active {
-      display: block;
-    }
-
-    .full-menu a {
-      display: block;
-      color: white;
-      font-size: 24px;
-      text-decoration: none;
-      margin: 20px 0;
-    }
-
-    .full-menu a:hover {
-      text-decoration: underline;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 28px;
-      color: white;
-      background: none;
-      border: none;
+    .menu-icon, .search-icon {
+      font-size: 1.2rem;
       cursor: pointer;
+      font-weight: bold;
+      position: relative;
     }
 
-    .close-label {
-      position: absolute;
-      top: 50px;
-      right: 20px;
+    .badge {
+      background: var(--badge-bg);
       color: white;
-      font-size: 12px;
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      position: absolute;
+      top: -5px;
+      right: -12px;
     }
 
-    section {
-      padding: 80px 20px;
-      max-width: 960px;
+    .title {
+      font-size: 1.2rem;
+    }
+
+    .logo {
+      display: block;
+      width: 100%;
+      height: auto;
       margin: 0 auto;
     }
 
-    .form-wrapper {
-      position: relative;
-      padding-bottom: 150%;
-      height: 0;
-      overflow: hidden;
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 250px;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 2em 1em;
+      box-sizing: border-box;
+      transition: left 0.3s ease;
+      z-index: 10;
     }
 
-    .form-wrapper iframe {
-      position: absolute;
-      top: 0;
+    .side-menu.open {
       left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
+    }
+
+    .side-menu .close-btn {
+      font-size: 2rem;
+      cursor: pointer;
+      text-align: right;
+      margin-bottom: 1em;
+    }
+
+    .side-menu nav a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 1em 0;
+      font-size: 1.2rem;
+    }
+
+    .search-box {
+      position: fixed;
+      top: 12px;
+      right: 60px;
+      z-index: 11;
+      display: none;
+    }
+
+    .search-box.active {
+      display: block;
+    }
+
+    .search-box input {
+      padding: 5px 10px;
+      font-size: 1rem;
+    }
+
+    main {
+      padding: 1em;
+    }
+
+    section {
+      margin-bottom: 2em;
+    }
+
+    #notice-area p {
+      margin: 0.5em 0;
+      border-left: 4px solid #333;
+      padding-left: 0.5em;
+      background: var(--notice-bg);
+    }
+
+    .highlight {
+      background-color: var(--highlight-color);
+    }
+
+    .new-tag {
+      color: red;
+      font-weight: bold;
+      margin-left: 0.5em;
+    }
+
+    .button-row {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 1em;
+      background: var(--header-bg);
+      border-top: 1px solid #999;
+    }
+
+    .button-row a {
+      flex: 1 1 40%;
+      text-align: center;
+      padding: 0.7em;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: opacity 0.3s;
+    }
+
+    .btn-web   { background: #007bff; }
+    .btn-line  { background: #00c300; }
+    .btn-phone { background: #e53935; }
+    .btn-contact { background: #ff9800; }
+
+    .button-row a:hover {
+      opacity: 0.85;
     }
 
     footer {
-      background-color: #f1f1f1;
       text-align: center;
-      padding: 15px 10px;
-      font-size: 0.9rem;
-      color: #333;
+      font-size: 0.8em;
+      color: #888;
+      padding: 1em;
+      background: var(--header-bg);
+    }
+
+    .service-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .service-card {
+      flex: 1 1 300px;
+      background: var(--notice-bg);
+      padding: 1.5em;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .service-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    }
+
+    .service-card h3 {
+      margin-top: 0;
+      font-size: 1.1em;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 0.5em;
+    }
+
+    .service-card ul {
+      padding-left: 1em;
+      margin: 1em 0 0;
+    }
+
+    .service-card li {
+      margin: 0.3em 0;
+    }
+
+    .card-link {
+      display: inline-block;
+      margin-top: 1em;
+      padding: 0.5em 1em;
+      background-color: #007bff;
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    .card-link:hover {
+      background-color: #0056b3;
+    }
+
+    @media (max-width: 600px) {
+      .button-row a {
+        flex: 1 1 100%;
+      }
+      .service-container {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-
-  <!-- ☰とMENU -->
-  <div class="top-bar" id="topBar">
-    <button class="menu-toggle" id="menuToggle">☰</button>
-  </div>
-  <div class="menu-label" id="menuLabel">MENU</div>
-
-  <!-- フルスクリーンメニュー -->
-  <div class="full-menu" id="fullMenu">
-    <button class="close-btn" id="closeBtn">✕</button>
-    <div class="close-label">閉じる</div>
-    <a href="#home">ホーム</a>
-    <a href="#about">会社概要</a>
-    <a href="#services">サービス</a>
-    <a href="#recruit">採用情報</a>
-    <a href="#contact">お問い合わせ</a>
-    <a href="予約/index.html">予約</a>
-    <a href="#price">料金</a>
-  </div>
-
-  <!-- ヘッダー -->
   <header>
-    <img src="logo.jpg" alt="株式会社Re-Light ロゴ">
+    <div class="menu-icon" onclick="toggleMenu()">☰ MENU <span id="badge" class="badge" style="display:none;">NEW</span></div>
+    <div class="title">株式会社Re-Light</div>
+    <div class="search-icon" onclick="toggleSearch()">🔍</div>
   </header>
-  
-  <!-- コンテンツ -->
-  <section id="home">
-    <h2>ホーム</h2>
-    <p>株式会社Re-Lightのホームページへようこそ。</p>
-    <p>実はこのホームページ、自分たちで作りました！</p>
-  </section>
-
-  <section id="about">
-    <h2>⬛︎会社概要</h2>
-    <p>会社名:株式会社Re-Light</p>
-    <p>所在地:</p>
-    <p>連絡先:</p>
-    <p>代表者名:</p>
-    <p>事業内容:
-    <p>資本金:</p>
-    <p>従業員数:</p>
-    <p>設立年月日:</p>
-    <p>沿革:</p>
-    <p>企業理念:</p>
-    <p>ミッション:</p>
-    <p>主要取引先:</p>
-    <p>主要取引銀行:</p>
-    <p>URL:会社のホームページアドレス</p>
-    <p>代表挨拶:</p>
-  </section>
-
-  <section id="services">
-    <h2>サービス</h2>
-    <p>身の回りの困り事をサポートします。</p>
-    <p>まずは<a href="お問い合わせ.html" target="_blank">こちら</a>からご相談ください</p>
-    <p>ご予約は<a href="予約.html" target="_blank">こちら</a>から</p>
-  </section>
-
-  <section id="recruit">
-    <h2>採用情報</h2>
-    <p>＊＊＊</p>
-  </section>
-
-  <section id="contact">
-    <h2>お問い合わせ</h2>
-    <p>お問い合わせは <a href="https://forms.gle/ZhMRmFJTKG2zRPyV9" target="_blank">こちら</a> からも可能です。</p>
-    <div class="form-wrapper">
-      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScU3UzPji6MzYm7DgjbRfC5nhjshpL5V-U8SlNZfqymAsWSCA/viewform?embedded=true" allowfullscreen>
-        読み込んでいます…
-      </iframe>
-    </div>
-  </section>
-
-  <footer>
-    © 2025 株式会社Re-Light. All Rights Reserved.
-  </footer>
-
-  <!-- スクリプト -->
+  <img src="logo.jpg" alt="ロゴ画像" class="logo" />
+  <div class="side-menu" id="sideMenu">
+    <div class="close-btn" onclick="toggleMenu()">×</div>
+    <nav>
+      <a href="#">■ HOME</a>
+      <a href="#notice-area">■ お知らせ</a>
+      <a href="#overview">■ 会社概要</a>
+      <a href="#services">■ サービス</a>
+    </nav>
+  </div>
+  <div class="search-box" id="searchBox">
+    <input type="text" placeholder="キーワード検索" oninput="searchText(this.value)" />
+  </div>
+  <main>
+    <section>
+      <h2>■ HOME</h2>
+      <p>株式会社Re-Lightのホームページへようこそ！<br>実はこのサイト...自分たちで作ったんです！</p>
+    </section>
+    <section id="notice-area">
+      <h2>■ お知らせ</h2>
+      <p>読み込み中...</p>
+    </section>
+    <section id="overview">
+      <h2>■ 会社概要</h2>
+      <ul>
+        <li>会社名：株式会社Re-Light</li>
+        <li>代表者：菅原 崇明</li>
+        <li>設立年月日：2026年1月1日</li>
+        <li>資本金：1円</li>
+        <li>従業員数：2人</li>
+        <li>所在地：現在非公開</li>
+      </ul>
+    </section>
+    <section id="services">
+      <h2>■ サービス</h2>
+      <div class="service-container">
+        <div class="service-card">
+          <h3>ご自宅に訪問して直接サポート</h3>
+          <ul>
+            <li>★ 自宅の模様替えで家具を移動して！</li>
+            <li>★ 不用品の回収をお願い！</li>
+            <li>★ 車のバッテリーが上がっちゃった！</li>
+            <li>など</li>
+          </ul>
+          <a href="visit-support.html" class="card-link">🔗 詳しく見る</a>
+        </div>
+        <div class="service-card">
+          <h3>LINEやZoomのビデオ通話で遠隔サポート</h3>
+          <ul>
+            <li>★ スマホ・パソコンの使い方を教えて！</li>
+            <li>★ Wi-Fiに接続したい！</li>
+            <li>など</li>
+          </ul>
+          <a href="remote-support.html" class="card-link">🔗 詳しく見る</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div class="button-row">
+    <a href="#" class="btn-web">WEB予約</a>
+    <a href="#" class="btn-line">LINE予約</a>
+    <a href="tel:090-1234-5678" class="btn-phone">電話予約</a>
+    <a href="#" class="btn-contact">お問い合わせ</a>
+  </div>
+  <footer>©2025 株式会社Re-Light. All Rights Reserved</footer>
   <script>
-    const menuToggle = document.getElementById('menuToggle');
-    const fullMenu = document.getElementById('fullMenu');
-    const closeBtn = document.getElementById('closeBtn');
-    const topBar = document.getElementById('topBar');
-    const menuLabel = document.getElementById('menuLabel');
-
-    menuToggle.addEventListener('click', () => {
-      fullMenu.classList.add('active');
-      topBar.classList.add('hidden');
-      menuLabel.style.display = 'none';
-    });
-
-    closeBtn.addEventListener('click', () => {
-      fullMenu.classList.remove('active');
-      topBar.classList.remove('hidden');
-      menuLabel.style.display = 'block';
-    });
-
-    document.querySelectorAll('.full-menu a').forEach(link => {
-      link.addEventListener('click', () => {
-        fullMenu.classList.remove('active');
-        topBar.classList.remove('hidden');
-        menuLabel.style.display = 'block';
+    function toggleMenu() {
+      document.getElementById("sideMenu").classList.toggle("open");
+    }
+    function toggleSearch() {
+      document.getElementById("searchBox").classList.toggle("active");
+    }
+    function searchText(keyword) {
+      const content = document.querySelector("main");
+      const elements = content.querySelectorAll("p, li, h2");
+      elements.forEach(el => {
+        const text = el.textContent;
+        if (keyword && text.includes(keyword)) {
+          const highlighted = text.replaceAll(keyword, `<span class="highlight">${keyword}</span>`);
+          el.innerHTML = highlighted;
+        } else {
+          el.innerHTML = text;
+        }
       });
-    });
+    }
+    fetch("https://script.google.com/macros/s/AKfycbz6L9KTnW4u6dnTUbUKocoaybguPSBpIxtJXbiD9ps6iqirKPJh05O1_cFglFzPbTdqtA/exec")
+      .then(res => res.json())
+      .then(data => {
+        const area = document.getElementById("notice-area");
+        const today = new Date().toISOString().slice(0, 10);
+        const sorted = data.news.map(item => ({ text: item[0], date: item[1] }))
+          .filter(n => n.text && n.date)
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+        const hasToday = sorted.some(n => n.date.startsWith(today));
+        if (hasToday) document.getElementById("badge").style.display = "inline-block";
+        area.innerHTML = "<h2>■ お知らせ</h2>" +
+          sorted.map(n => `<p>■ ${n.text} <small>（${n.date}）</small>${n.date.startsWith(today) ? ' <span class=\"new-tag\">NEW</span>' : ''}</p>`).join('');
+      })
+      .catch(() => {
+        document.getElementById("notice-area").innerHTML = "<p>お知らせの取得に失敗しました。</p>";
+      });
   </script>
-
 </body>
 </html>
