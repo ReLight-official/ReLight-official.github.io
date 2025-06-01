@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>株式会社Re-Light</title>
+
+  <!-- ✅ ホーム画面アイコン・PWA関連設定 -->
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" sizes="192x192" href="icon-192.png">
+  <link rel="icon" sizes="512x512" href="icon-512.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Re-Light">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
   <style>
     :root {
       --bg-color: #ffffff;
@@ -32,15 +41,13 @@
       color: var(--text-color);
     }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(240, 240, 240, 0.7);
-  padding: 12px 16px;
-  border-bottom: 1px solid #666;
-
-}
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(240, 240, 240, 0.7);
+      padding: 12px 16px;
+      border-bottom: 1px solid #666;
     }
 
     .menu-icon, .search-icon {
@@ -246,9 +253,9 @@ header {
         flex-direction: column;
       }
       .menu-icon {
-       font-size: 1.5rem;
+        font-size: 1.5rem;
+      }
     }
-  }
   </style>
 </head>
 <body>
@@ -322,6 +329,7 @@ header {
     <a href="#" class="btn-contact">お問い合わせ</a>
   </div>
   <footer>©2025 株式会社Re-Light. All Rights Reserved</footer>
+
   <script>
     function toggleMenu() {
       document.getElementById("sideMenu").classList.toggle("open");
@@ -342,6 +350,7 @@ header {
         }
       });
     }
+
     fetch("https://script.google.com/macros/s/AKfycbz6L9KTnW4u6dnTUbUKocoaybguPSBpIxtJXbiD9ps6iqirKPJh05O1_cFglFzPbTdqtA/exec")
       .then(res => res.json())
       .then(data => {
@@ -353,7 +362,7 @@ header {
         const hasToday = sorted.some(n => n.date.startsWith(today));
         if (hasToday) document.getElementById("badge").style.display = "inline-block";
         area.innerHTML = "<h2>■ お知らせ</h2>" +
-          sorted.map(n => `<p>■ ${n.text} <small>（${n.date}）</small>${n.date.startsWith(today) ? ' <span class=\"new-tag\">NEW</span>' : ''}</p>`).join('');
+          sorted.map(n => `<p>■ ${n.text} <small>（${n.date}）</small>${n.date.startsWith(today) ? ' <span class="new-tag">NEW</span>' : ''}</p>`).join('');
       })
       .catch(() => {
         document.getElementById("notice-area").innerHTML = "<p>お知らせの取得に失敗しました。</p>";
